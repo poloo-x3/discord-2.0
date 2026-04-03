@@ -17,7 +17,6 @@ public class ClientReciver implements Runnable {
                 System.out.println(input.readUTF());
             }
         } catch (IOException e) {
-            e.printStackTrace();
         }
 
     }

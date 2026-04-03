@@ -13,11 +13,10 @@ public class Listener implements Runnable {
     @Override
     public void run() {
         try {
-            while (true) {
+            while (!Thread.interrupted()) {
                 System.out.println(input.readUTF());
             }
         } catch (IOException e) {
-            e.printStackTrace();
         }
 
     }

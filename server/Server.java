@@ -9,12 +9,12 @@ public class Server {
         final Chat chat = new Chat();
 
         try (ServerSocket server = new ServerSocket(PORT)) {
-            server.setSoTimeout(10000);
             System.out.println("Server started!");
+            server.setSoTimeout(10000);
 
             while (!Thread.interrupted()) {
                 Socket socket = server.accept();
-                new ClientConnection(chat, socket);
+                new Thread(new ClientConnection(chat, socket));
             }
 
         } catch (IOException e) {
