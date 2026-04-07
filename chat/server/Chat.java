@@ -5,7 +5,7 @@ import java.io.*;
 
 public class Chat {
     ArrayList<ClientConnection> connectedPeople = new ArrayList<>();
-    HashMap<String, Integer> users = new HashMap<>();
+    HashMap<String, HashMap<String, String>> users = new HashMap<>();
     HashMap<Integer, ArrayList<String>> directMessages = new HashMap<>();
     File userdb;
     File messagedb;
@@ -30,7 +30,10 @@ public class Chat {
         try (Scanner fileReader = new Scanner(new FileReader(userdb))) {
             while (fileReader.hasNextLine()) {
                 String[] line = fileReader.nextLine().strip().split(": ");
-                users.put(line[0], Integer.parseInt(line[1]));
+                HashMap<String, String> user = new HashMap<>();
+                users.put(line[0], user);
+                user.put("Password", line[1]);
+                user.put("Role", line[2]);
             }
 
         } catch (IOException e) {
@@ -93,11 +96,11 @@ public class Chat {
     }
 
     protected synchronized boolean isCorrectPassword(String username, String password) {
-        return users.get(username) == username.hashCode() * password.hashCode();
+        return Objects.equals(users.get(username).get("Password"), Integer.toString(username.hashCode() * password.hashCode()));
     }
 
     protected synchronized void addNewUser(String username, String password) {
-        users.put(username, username.hashCode() * password.hashCode());
+        users.get(username).put("Password", Integer.toString(username.hashCode() * password.hashCode()));
 
         try (PrintWriter file = new PrintWriter(new FileWriter(userdb, true))) {
             file.println(String.format("%s: %d", username, username.hashCode() * password.hashCode()));
@@ -112,7 +115,6 @@ public class Chat {
         }
 
     }
-
 
     protected synchronized void connectUser(ClientConnection client, String username) {
         if (!connectedPeople.contains(client)) {
@@ -152,6 +154,10 @@ public class Chat {
             }
         }
         messages.replaceAll(message -> message.startsWith("(new) ") ? message.substring(6, message.length()) : message);
+    }
+
+    protected synchronized void setUserRole(String username, Role role) {
+        users.get(username).put("Role", role.name());
     }
 }
 

@@ -144,6 +144,10 @@ public class ConnectionReceiver implements Runnable {
             sendMessage("Server: you can't kick yourself!");
             return;
         }
+
+
+        // TODO: Actually kick live users.
+        chat.setUserRole(tokens[1], Role.KICKED);
     }
 }
 
