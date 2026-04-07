@@ -107,11 +107,13 @@ public class Chat {
         return Objects.equals(users.get(username).get("Password"), Integer.toString(username.hashCode() * password.hashCode()));
     }
 
-    protected synchronized void addNewUser(String username, String password) {
+    protected synchronized void registerNewUser(String username, String password) {
+        users.put(username, new HashMap<>());
         users.get(username).put("Password", Integer.toString(username.hashCode() * password.hashCode()));
+        users.get(username).put("Role", Role.USER.name());
 
         try (PrintWriter file = new PrintWriter(new FileWriter(userdb, true))) {
-            file.println(String.format("%s;;%d", username, username.hashCode() * password.hashCode()));
+            file.println(String.format("%s;;%d;;USER", username, username.hashCode() * password.hashCode()));
         } catch (IOException e) {
             System.out.println("Could not add user to database");
             return;
@@ -132,7 +134,8 @@ public class Chat {
         client.setRole(Role.valueOf(users.get(username).get("Role")));
     }
 
-    protected synchronized void disconnectUser(ClientConnection client) {
+    protected synchronized void disconnect(ClientConnection client) {
+        client.disconnect();
         connectedPeople.remove(client);
     }
 

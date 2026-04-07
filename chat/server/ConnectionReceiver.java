@@ -1,7 +1,5 @@
 package chat.server;
 
-import chat.client.ClientReciver;
-
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.Objects;
@@ -26,7 +24,7 @@ public class ConnectionReceiver implements Runnable {
 
         try {
             sendMessage("Server: authorize or register");
-            while (meow) {
+            while (!Thread.interrupted()) {
                 msg = input.readUTF();
                 if (msg.startsWith("/")) {
                     String[] tokens = msg.split(" ");
@@ -36,10 +34,7 @@ public class ConnectionReceiver implements Runnable {
                         case "/registration" -> registerUser(tokens);
                         case "/chat" -> selectChat(tokens);
                         case "/kick" -> kickUser(tokens);
-                        case "/exit" -> {
-                            chat.disconnectUser(parent);
-                            meow = false;
-                        }
+                        case "/exit" -> chat.disconnect(parent);
                         default -> parent.sendMessage("Server: incorrect command!");
                     }
                     continue;
@@ -103,7 +98,7 @@ public class ConnectionReceiver implements Runnable {
             return;
         }
 
-        chat.addNewUser(tokens[1], tokens[2]);
+        chat.registerNewUser(tokens[1], tokens[2]);
         sendMessage("Server: you are registered successfully!");
 
         loggedIn = true;
@@ -124,7 +119,7 @@ public class ConnectionReceiver implements Runnable {
     private void sendDirectMessage(String toUser, String message) {
         int chatHashCode = parent.getUsername().hashCode() * toUser.hashCode();
 
-        if (Objects.equals(chat.getUser(toUser).connectionReciever.selectedUser, parent.username)) {
+        if (Objects.equals(chat.getUser(toUser).connectionReceiver.selectedUser, parent.username)) {
             chat.sendDirectMessage(toUser, parent.getUsername() + ": " + message);
             chat.addMessageToDatabase(chatHashCode, parent.getUsername() + ": " + message);
             sendMessage(parent.getUsername() + ": " + message);
@@ -149,7 +144,7 @@ public class ConnectionReceiver implements Runnable {
         chat.setUserRole(tokens[1], Role.KICKED);
         ClientConnection selectedUser = chat.getUser(tokens[1]);
         if (selectedUser != null) {
-            chat.disconnectUser(selectedUser);
+            chat.disconnect(selectedUser);
         }
     }
 }

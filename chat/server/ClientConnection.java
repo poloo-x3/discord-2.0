@@ -10,7 +10,8 @@ public class ClientConnection implements Runnable {
     final Chat chat;
     final Socket socket;
     String username;
-    ConnectionReceiver connectionReciever;
+    ConnectionReceiver connectionReceiver;
+    Thread receiverThread;
     DataOutputStream output;
     final Scanner scanner = new Scanner(System.in);
     Role role = Role.USER;
@@ -20,8 +21,9 @@ public class ClientConnection implements Runnable {
         this.socket = socket;
         try {
             this.output = new DataOutputStream(socket.getOutputStream());
-            this.connectionReciever = new ConnectionReceiver(new DataInputStream(socket.getInputStream()), chat, this);
-            new Thread(connectionReciever).start();
+            this.connectionReceiver = new ConnectionReceiver(new DataInputStream(socket.getInputStream()), chat, this);
+            this.receiverThread = new Thread(connectionReceiver);
+            receiverThread.start();
 
         } catch (IOException e) {
             System.out.println("Could not establish connection with Client");
@@ -30,7 +32,7 @@ public class ClientConnection implements Runnable {
 
     @Override
     public void run() {
-        while (true) scanner.nextLine();
+        while (!Thread.currentThread().isInterrupted()) scanner.nextLine();
     }
 
     protected void setUsername(String username) {
@@ -47,6 +49,11 @@ public class ClientConnection implements Runnable {
 
     protected Role getRole() {
         return role;
+    }
+
+    protected void disconnect() {
+        receiverThread.interrupt();
+        Thread.currentThread().interrupt();
     }
 
     protected void sendMessage(String message) {
