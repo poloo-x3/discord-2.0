@@ -22,14 +22,22 @@ public class Chat {
 
     protected void loadUsersFromFile() {
         try {
-            userdb.createNewFile();
+            if (userdb.createNewFile()) {
+                try (PrintWriter file = new PrintWriter(new FileWriter(userdb, true))) {
+                    file.println("admin;;-966019908;;ADMIN");
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
+
+
         try (Scanner fileReader = new Scanner(new FileReader(userdb))) {
             while (fileReader.hasNextLine()) {
-                String[] line = fileReader.nextLine().strip().split(": ");
+                String[] line = fileReader.nextLine().strip().split(";;");
                 HashMap<String, String> user = new HashMap<>();
                 users.put(line[0], user);
                 user.put("Password", line[1]);
@@ -103,7 +111,7 @@ public class Chat {
         users.get(username).put("Password", Integer.toString(username.hashCode() * password.hashCode()));
 
         try (PrintWriter file = new PrintWriter(new FileWriter(userdb, true))) {
-            file.println(String.format("%s: %d", username, username.hashCode() * password.hashCode()));
+            file.println(String.format("%s;;%d", username, username.hashCode() * password.hashCode()));
         } catch (IOException e) {
             System.out.println("Could not add user to database");
             return;
@@ -121,6 +129,7 @@ public class Chat {
             connectedPeople.add(client);
         }
         client.setUsername(username);
+        client.setRole(Role.valueOf(users.get(username).get("Role")));
     }
 
     protected synchronized void disconnectUser(ClientConnection client) {

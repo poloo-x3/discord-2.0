@@ -1,5 +1,7 @@
 package chat.server;
 
+import chat.client.ClientReciver;
+
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.Objects;
@@ -57,7 +59,6 @@ public class ConnectionReceiver implements Runnable {
             }
         } catch (IOException e) {
             System.out.println("meow mother fucker");
-            e.printStackTrace();
         }
     }
 
@@ -145,9 +146,11 @@ public class ConnectionReceiver implements Runnable {
             return;
         }
 
-
-        // TODO: Actually kick live users.
         chat.setUserRole(tokens[1], Role.KICKED);
+        ClientConnection selectedUser = chat.getUser(tokens[1]);
+        if (selectedUser != null) {
+            chat.disconnectUser(selectedUser);
+        }
     }
 }
 

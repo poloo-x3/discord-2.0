@@ -41,6 +41,10 @@ public class ClientConnection implements Runnable {
         return username;
     }
 
+    protected void setRole(Role role) {
+        this.role = role;
+    }
+
     protected Role getRole() {
         return role;
     }
