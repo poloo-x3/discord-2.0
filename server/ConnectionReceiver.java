@@ -33,6 +33,7 @@ public class ConnectionReceiver implements Runnable {
                         case "/auth" -> authenticateUser(tokens);
                         case "/registration" -> registerUser(tokens);
                         case "/chat" -> selectChat(tokens);
+                        case "/kick" -> kickUser(tokens);
                         case "/exit" -> {
                             chat.disconnectUser(parent);
                             meow = false;
@@ -131,6 +132,18 @@ public class ConnectionReceiver implements Runnable {
 
         chat.addMessageToDatabase(chatHashCode, "(new) " + parent.getUsername() + ": " + message);
         sendMessage(parent.getUsername() + ": " + message);
+    }
+
+    private void kickUser(String[] tokens) {
+        if (parent.getRole() == Role.USER) {
+            sendMessage("Server: you are not a moderator or an admin!");
+            return;
+        }
+
+        if (tokens[1].equals(parent.getUsername())) {
+            sendMessage("Server: you can't kick yourself!");
+            return;
+        }
     }
 }
 

@@ -129,7 +129,7 @@ public class Chat {
         directMessages.get(chatHashCode).add(message);
 
         try (PrintWriter file = new PrintWriter(new FileWriter(messagedb, true))) {
-            file.println(String.format("%d;%s", fromUser.hashCode() * toUser.hashCode(), message));
+            file.println(String.format("%d;%s", chatHashCode, message));
         } catch (IOException e) {
             System.out.println("Could not add message to database");
         }

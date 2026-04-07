@@ -13,6 +13,7 @@ public class ClientConnection implements Runnable {
     ConnectionReceiver connectionReciever;
     DataOutputStream output;
     final Scanner scanner = new Scanner(System.in);
+    Role role = Role.USER;
 
     public ClientConnection(Chat chat, Socket socket) {
         this.chat = chat;
@@ -38,6 +39,10 @@ public class ClientConnection implements Runnable {
 
     protected String getUsername() {
         return username;
+    }
+
+    protected Role getRole() {
+        return role;
     }
 
     protected void sendMessage(String message) {

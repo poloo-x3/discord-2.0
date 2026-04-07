@@ -10,7 +10,6 @@ public class Server {
 
         try (ServerSocket server = new ServerSocket(PORT)) {
             System.out.println("Server started!");
-            server.setSoTimeout(10000);
 
             while (!Thread.interrupted()) {
                 Socket socket = server.accept();
