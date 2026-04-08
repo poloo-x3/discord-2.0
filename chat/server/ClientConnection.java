@@ -22,7 +22,6 @@ public class ClientConnection implements Runnable {
     }
 
     protected void disconnect() {
-        receiverThread.interrupt();
         Thread.currentThread().interrupt();
     }
 

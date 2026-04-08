@@ -15,13 +15,17 @@ public class ConnectionReceiver implements Runnable {
 
     @Override
     public void run() {
-        while (!Thread.interrupted()) {
+        while (!Thread.currentThread().isInterrupted()) {
             try {
-                user.run(input.readUTF());
+                user.parseInput(input.readUTF());
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    protected void disconnect() {
+        Thread.currentThread().interrupt();
     }
 }
 

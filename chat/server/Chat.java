@@ -1,5 +1,6 @@
 package chat.server;
 
+import java.lang.reflect.Array;
 import java.util.*;
 import java.io.*;
 
@@ -82,16 +83,15 @@ public class Chat {
             return "no one online";
         }
 
-        ArrayList<String> allUsernames = new ArrayList<>();
-        connectedPeople.forEach(user -> allUsernames.add(user.getUsername()));
-        allUsernames.remove(username);
+        ArrayList<User> allUsernames = new ArrayList<>(connectedPeople);
+        allUsernames.remove(getUser(username));
 
         return "online: " + allUsernames.toString().substring(1, allUsernames.toString().length() - 1);
     }
 
     protected User getUser(String name) {
         for (User user: connectedPeople) {
-            if (user.getUsername().equals(name)) {
+            if (Objects.equals(user.getUsername(), name)) {
                 return user;
             }
         }
@@ -126,7 +126,7 @@ public class Chat {
 
     }
 
-    protected synchronized void connectUser(ClientConnection client, String username) {
+    protected synchronized void connectUser(User client, String username) {
         if (!connectedPeople.contains(client)) {
             connectedPeople.add(client);
         }
@@ -134,7 +134,7 @@ public class Chat {
         client.setRole(Role.valueOf(users.get(username).get("Role")));
     }
 
-    protected synchronized void disconnect(ClientConnection client) {
+    protected synchronized void disconnect(User client) {
         client.disconnect();
         connectedPeople.remove(client);
     }
@@ -170,6 +170,19 @@ public class Chat {
 
     protected synchronized void setUserRole(String username, Role role) {
         users.get(username).put("Role", role.name());
+
+        try (PrintWriter file = new PrintWriter(new FileWriter(userdb, false))) {
+            for (String key: users.keySet()) {
+                ArrayList<String> values = new ArrayList<>(users.get(key).values());
+                file.println(String.format("%s;;%s;;%s", key, values.get(1), values.get(0)));
+            }
+        } catch (IOException e) {
+            System.out.println("Could not add user to database");
+        }
+    }
+
+    protected synchronized void setUsername(String username, String newUsername) {
+        getUser(username).setUsername(newUsername);
     }
 }
 
