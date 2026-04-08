@@ -4,7 +4,7 @@ import java.util.*;
 import java.io.*;
 
 public class Chat {
-    ArrayList<ClientConnection> connectedPeople = new ArrayList<>();
+    ArrayList<User> connectedPeople = new ArrayList<>();
     HashMap<String, HashMap<String, String>> users = new HashMap<>();
     HashMap<Integer, ArrayList<String>> directMessages = new HashMap<>();
     File userdb;
@@ -89,8 +89,8 @@ public class Chat {
         return "online: " + allUsernames.toString().substring(1, allUsernames.toString().length() - 1);
     }
 
-    protected ClientConnection getUser(String name) {
-        for (ClientConnection user: connectedPeople) {
+    protected User getUser(String name) {
+        for (User user: connectedPeople) {
             if (user.getUsername().equals(name)) {
                 return user;
             }

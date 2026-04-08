@@ -18,6 +18,5 @@ public class ClientReciver implements Runnable {
             }
         } catch (IOException e) {
         }
-
     }
 }

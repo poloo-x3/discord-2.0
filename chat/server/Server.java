@@ -13,9 +13,8 @@ public class Server {
 
             while (!Thread.interrupted()) {
                 Socket socket = server.accept();
-                new Thread(new ClientConnection(chat, socket));
+                new User(chat, socket);
             }
-
         } catch (IOException e) {
             System.out.println("Could not establish connection with Client.");
         }
